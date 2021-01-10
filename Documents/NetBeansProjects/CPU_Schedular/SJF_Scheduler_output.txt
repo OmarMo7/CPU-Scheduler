@@ -1,0 +1,36 @@
+Processes execution order : 
+Q2P1
+Q2P1
+Q2P1
+Q2P1
+Q2P1
+Q2P2
+Q2P2
+Q2P4
+Q2P4
+Q2P5
+Q2P5
+Q2P5
+Q2P3
+Q2P3
+Q2P3
+Q2P3
+----------------------
+
+Turnaround time : 
+Q2P1  5
+Q2P2  3
+Q2P4  4
+Q2P5  6
+Q2P3  12
+----------------------
+Avg turnaround time = 6.0
+
+Waiting time : 
+Q2P1  0
+Q2P2  1
+Q2P4  2
+Q2P5  3
+Q2P3  8
+----------------------
+Avg Waiting time = 2.8
