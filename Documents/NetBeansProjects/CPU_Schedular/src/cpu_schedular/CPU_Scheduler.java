@@ -27,7 +27,8 @@ public class CPU_Scheduler {
         for (int i = 0; i < numOfQueue; i++) {
             String data = br.readLine();
             String[] arr = data.split(" ");
-            Queue cur = new Queue(Integer.parseInt(arr[0]), arr[1], Integer.parseInt(arr[2])) {};
+            Queue cur = new Queue(Integer.parseInt(arr[0]), arr[1], Integer.parseInt(arr[2])) {
+            };
             Q.add(cur);
         }
 
@@ -60,10 +61,10 @@ public class CPU_Scheduler {
         int max_priority = arrived_processes.get(0).getPriority();
 
         for (int j = 0; j < arrived_processes.size(); j++) {
-                if (arrived_processes.get(j).getPriority() > max_priority) {
-                    max_priority = arrived_processes.get(j).getPriority();
-                }
+            if (arrived_processes.get(j).getPriority() > max_priority) {
+                max_priority = arrived_processes.get(j).getPriority();
             }
+        }
 
         for (int j = 0; j < arrived_processes.size(); j++) // to add max priority 
         {
@@ -71,6 +72,24 @@ public class CPU_Scheduler {
                 max.add(arrived_processes.get(j));
             }
         }
+
+    }
+
+    Process get_min_burst_time(ArrayList<Process> Max_priority) {
+
+        Process cur_process = new Process();
+        int min_burst_time = Max_priority.get(0).getBurstTime();
+
+        cur_process = Max_priority.get(0);
+
+        for (int j = 0; j < Max_priority.size(); j++) {
+            if (Max_priority.get(j).getBurstTime() < min_burst_time) {
+                min_burst_time = Max_priority.get(j).getBurstTime();
+                cur_process = Max_priority.get(j);
+            }
+        }
+
+        return cur_process;
 
     }
 
@@ -94,23 +113,22 @@ public class CPU_Scheduler {
 
     }
 
-    Process get_min_burst_time(ArrayList<Process> Max_priority) {
+    Process get_last_arrives(ArrayList<Process> Max_priority) {
 
         Process cur_process = new Process();
-        int min_burst_time = Max_priority.get(0).getBurstTime();
+        int max_arrival_time = Max_priority.get(Max_priority.size() - 1).getNewarrivalTime();
+        cur_process = Max_priority.get(Max_priority.size() - 1);
 
-        cur_process = Max_priority.get(0);
-
-        
+        for (Process Max_priority1 : Max_priority) {
             for (int j = 0; j < Max_priority.size(); j++) {
-                if (Max_priority.get(j).getBurstTime() < min_burst_time) {
-                    min_burst_time = Max_priority.get(j).getBurstTime();
+                if (Max_priority1.getNewarrivalTime() > max_arrival_time) {
+                    max_arrival_time = Max_priority.get(j).getNewarrivalTime();
                     cur_process = Max_priority.get(j);
                 }
             }
+        }
 
         return cur_process;
-
     }
 
     int search_by_name(Process a, ArrayList<Process> readyQueue) {
@@ -144,7 +162,7 @@ public class CPU_Scheduler {
         out.format("----------------------");
         out.format("%n");
         out.format("%n");
-        out.format("Trun around time : ");
+        out.format("Turnaround time : ");
         out.format("%n");
         double total = 0;
         for (int i = 0; i < unique.size(); i++) {
@@ -157,6 +175,23 @@ public class CPU_Scheduler {
         out.format("%n");
 
         out.format("Avg turnaround time = " + total / unique.size());
+
+        ///////////////////////////////////////
+        out.format("%n");
+        out.format("%n");
+        out.format("Waiting time : ");
+        out.format("%n");
+        double totalWaitingAvg = 0;
+        for (int i = 0; i < unique.size(); i++) {
+            out.format("%s", unique.get(i).getProcessName() + "  " + unique.get(i).getWaitingTime());
+            totalWaitingAvg += unique.get(i).getWaitingTime();
+            out.format("%n");
+        }
+
+        out.format("----------------------");
+        out.format("%n");
+
+        out.format("Avg Waiting time = " + totalWaitingAvg / unique.size());
 
         out.flush(); // 34an yktb 3al file
         out.close();
@@ -177,44 +212,50 @@ public class CPU_Scheduler {
             get_max_priority(arrived_processes, Max_priority);
             Process cur_process = new Process();
 
-            if (Max_priority.size() == 1) // y3ny mfe4 etnen aw aktr lehom nfs el arrival time we nfs el probability
+            if (Max_priority.size() == 1 && !Max_priority.get(0).getAlg().equals("FCFS")) // y3ny mfe4 etnen aw aktr lehom nfs el arrival time we nfs el probability
             {
                 cur_process = Max_priority.get(0);
 
             } else // feeh kza 7ad 3ndo el max priority " y3ny more than one mn nfs el algo/queue gom -> han48l anhy el awel ?? " ... hanro7 ngeb eli geh bdry           
             {
-                if (Max_priority.get(0).getAlg().equals("SJF")) {
-                    cur_process = get_min_burst_time(Max_priority);
-                } else {
-                    cur_process = get_first_arrives(Max_priority);
-                }
 
+                cur_process = get_first_arrives(Max_priority);
             }
 
-            System.out.println("cur process = " + cur_process.getProcessName());
+            System.out.println("Multi-Level_Scheduler: current process = " + cur_process.getProcessName());
 
             switch (cur_process.getAlg()) {
                 case "FCFS":
-                    cur_time += cur_process.getBurstTime();
+                    int i;
+                    Process lastArrives = get_last_arrives(readyQueue);
+
+                    if (lastArrives.getPriority() > cur_process.getPriority() && cur_process.getRemaningTime() + cur_time > lastArrives.getArrivalTime()) {
+                        i = lastArrives.getArrivalTime() - cur_time;
+                        while (i > 0) {
+                            cur_time += 1;
+                            cur_process.setRemaningTime(cur_process.getRemaningTime() - 1);
+                            i--;
+                        }
+                        break;
+                    }
+                    cur_time += cur_process.getRemaningTime();
                     cur_process.setRemaningTime(0);
                     break;
-                case "SJF":
-                    cur_time += cur_process.getBurstTime(); // +1 34an el context switch 
-                    cur_process.setRemaningTime(0);
-                    break;
-            // RR
-                default:
+                case "RR":
                     if (cur_process.getRemaningTime() > Quantum) {
                         cur_time += Quantum;
                         cur_process.setRemaningTime(cur_process.getRemaningTime() - Quantum);
                         cur_process.setNewarrivalTime(cur_time);
                         done.add(cur_process); // just added to the excuted orders
-                        
+
                     } else {
                         cur_time += cur_process.getRemaningTime();
                         cur_process.setRemaningTime(0);
-                        
-                    }   break;
+
+                    }
+                    break;
+                default:
+                    break;
             }
 
             if (cur_process.getRemaningTime() == 0) {
@@ -227,15 +268,12 @@ public class CPU_Scheduler {
 
             }
 
-            cur_time++;
-
             arrived_processes.clear();
 
         }
 
-        Write_file("output.txt", done, unique);
+        Write_file("Multi_Level_Scheduler_output.txt", done, unique);
 
     }
 
-    
 }
