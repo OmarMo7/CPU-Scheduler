@@ -13,7 +13,8 @@ public class Process {
 
     private String processName; //
     private String Alg; //
-    private int arrivalTime; // 
+    private int arrivalTime;
+    private int waitingTime;// 
     private int NewarrivalTime; // 
 
     public int getNewarrivalTime() {
@@ -64,6 +65,14 @@ public class Process {
 
     public void setArrivalTime(int arrivalTime) {
         this.arrivalTime = arrivalTime;
+    }
+    
+    public int getWaitingTime() {
+        return waitingTime;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
     }
 
     public int getBurstTime() {
