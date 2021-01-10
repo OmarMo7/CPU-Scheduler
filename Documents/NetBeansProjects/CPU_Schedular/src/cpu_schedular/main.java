@@ -21,10 +21,13 @@ public class main {
     public static void main(String[] args) throws IOException {
 
         ArrayList<Process> readyQueue = new ArrayList<>();
+        SJF_Scheduler s = new SJF_Scheduler();
+        s.readFile("SJF_Scheduler_input.txt", readyQueue);
+        s.Excute(readyQueue);
         CPU_Scheduler c = new CPU_Scheduler();
-        c.readFile("input.txt", readyQueue);
+        c.readFile("Multi_Level_Scheduler_input.txt", readyQueue);
         c.Excute(readyQueue);
-
+        
     }
     
 }
