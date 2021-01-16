@@ -24,9 +24,15 @@ public class main {
         SJF_Scheduler s = new SJF_Scheduler();
         s.readFile("SJF_Scheduler_input.txt", readyQueue);
         s.Excute(readyQueue);
-        CPU_Scheduler c = new CPU_Scheduler();
+        RR_Scheduler r = new RR_Scheduler();
+        r.readFile("Round-Robin_Scheduler_input.txt", readyQueue);
+        r.Excute(readyQueue);
+        Multi_Level_Scheduler c = new Multi_Level_Scheduler();
         c.readFile("Multi_Level_Scheduler_input.txt", readyQueue);
         c.Excute(readyQueue);
+        Priority_Scheduler p = new Priority_Scheduler();
+        p.readFile("Priority_Scheduler_input.txt", readyQueue);
+        p.Excute(readyQueue);
         
     }
     
