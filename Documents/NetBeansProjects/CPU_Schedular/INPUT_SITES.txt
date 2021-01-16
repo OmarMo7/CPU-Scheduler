@@ -1,0 +1,8 @@
+priority - https://www.geeksforgeeks.org/difference-between-preemptive-priority-based-and-non-preemptive-priority-based-cpu-scheduling-algorithms/?ref=rp
+
+SJF - https://www.guru99.com/shortest-job-first-sjf-scheduling.html
+
+Multi - Assignment
+
+RR - 
+https://www.guru99.com/round-robin-scheduling-example.html
