@@ -1,0 +1,23 @@
+Round-Robin_Scheduler - Processes execution order : 
+P1
+P2
+P3
+P1
+P3
+P2
+P3
+----------------------
+
+Turnaround time : 
+P2  11
+P3  12
+P1  8
+----------------------
+Avg turnaround time = 10.333333333333334
+
+Waiting time : 
+P2  8
+P3  7
+P1  4
+----------------------
+Avg Waiting time = 6.333333333333333
