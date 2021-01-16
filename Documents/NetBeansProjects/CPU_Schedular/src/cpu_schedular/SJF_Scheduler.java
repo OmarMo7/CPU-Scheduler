@@ -5,6 +5,9 @@
  */
 package cpu_schedular;
 
+import static cpu_schedular.Utils.get_arrived_processes;
+import static cpu_schedular.Utils.get_min_remaining;
+import static cpu_schedular.Utils.search_by_name;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,62 +36,6 @@ public class SJF_Scheduler {
 
     }
 
-    void get_arrived_processes(ArrayList<Process> readyQueue, ArrayList<Process> arrived_processes, int time) {
-        for (int i = 0; i < readyQueue.size(); i++) {
-            if (readyQueue.get(i).getArrivalTime() <= time) {
-                arrived_processes.add(readyQueue.get(i));
-            }
-        }
-    }
-
-    Process get_min_burst_time(ArrayList<Process> Max_priority) {
-
-        Process cur_process = new Process();
-        int min_burst_time = Max_priority.get(0).getBurstTime();
-
-        cur_process = Max_priority.get(0);
-
-        for (int j = 0; j < Max_priority.size(); j++) {
-            if (Max_priority.get(j).getBurstTime() < min_burst_time) {
-                min_burst_time = Max_priority.get(j).getBurstTime();
-                cur_process = Max_priority.get(j);
-            }
-        }
-
-        return cur_process;
-
-    }
-
-    Process get_min_remaining(ArrayList<Process> Max_priority) {
-
-        Process cur_process = new Process();
-        int min_remaining = Max_priority.get(0).getRemaningTime();
-
-        cur_process = Max_priority.get(0);
-
-        for (int j = 0; j < Max_priority.size(); j++) {
-            if (Max_priority.get(j).getRemaningTime() < min_remaining) {
-                min_remaining = Max_priority.get(j).getRemaningTime();
-                cur_process = Max_priority.get(j);
-            }
-        }
-
-        return cur_process;
-
-    }
-
-    int search_by_name(Process a, ArrayList<Process> readyQueue) {
-        int indx = -1;
-
-        for (int i = 0; i < readyQueue.size(); i++) {
-            if (a.getProcessName().equals(readyQueue.get(i).getProcessName())) {
-                indx = i;
-                break;
-            }
-        }
-        return indx;
-    }
-
     void Write_file(String path, ArrayList<Process> done, ArrayList<Process> unique) {
         Formatter out = new Formatter();
 
@@ -98,7 +45,7 @@ public class SJF_Scheduler {
             System.out.println("Can not find File " + e);
         }
 
-        out.format("Processes execution order : ");
+        out.format("SJF_Scheduler - Processes execution order : ");
         out.format("%n");
         for (int i = 0; i < done.size(); i++) {
             out.format("%s", done.get(i).getProcessName());
@@ -186,7 +133,13 @@ public class SJF_Scheduler {
                     current_time += 1;
                     continue;
                 }
-                if (arrived_processes.size() > 1) {
+                if (arrived_processes.size() == 1) {
+                    current_time += 1;
+                    cur_process = arrived_processes.get(0);
+                    AllProgress.add(cur_process);
+                    cur_process.setRemaningTime(cur_process.getRemaningTime() - 1);
+
+                } else {
                     current_time += 1;
                     cur_process = get_first_arrives(arrived_processes);
                     min_process = get_min_remaining(arrived_processes);
@@ -198,23 +151,12 @@ public class SJF_Scheduler {
                         AllProgress.add(cur_process);
                         cur_process.setRemaningTime(cur_process.getRemaningTime() - 1);
                     }
-                    if (cur_process.getRemaningTime() == 0) {
-                        cur_process.setEndTime(current_time);
-                        int index = search_by_name(cur_process, readyQueue);
-                        readyQueue.remove(index);
-                    }
-                    System.out.println("SJF_Scheduler: current process = " + cur_process.getProcessName());
 
-                } else if (arrived_processes.size() == 1) {
-                    current_time += 1;
-                    cur_process = arrived_processes.get(0);
-                    AllProgress.add(cur_process);
-                    cur_process.setRemaningTime(cur_process.getRemaningTime() - 1);
-                    if (cur_process.getRemaningTime() == 0) {
-                        cur_process.setEndTime(current_time);
-                        int index = search_by_name(cur_process, readyQueue);
-                        readyQueue.remove(index);
-                    }
+                }
+                if (cur_process.getRemaningTime() == 0) {
+                    cur_process.setEndTime(current_time);
+                    int index = search_by_name(cur_process, readyQueue);
+                    readyQueue.remove(index);
                 }
                 System.out.println("SJF_Scheduler: current process = " + cur_process.getProcessName());
 
@@ -222,12 +164,11 @@ public class SJF_Scheduler {
             }
         }
 
-        for (int i = 1; i < AllProgress.size(); i++) {
-            if (AllProgress.get(i).getProcessName() != AllProgress.get(i - 1).getProcessName()) {
-                unique.add(AllProgress.get(i - 1));
+        for (int i = 0; i < AllProgress.size(); i++) {
+            if (!unique.contains(AllProgress.get(i))) {
+                unique.add(AllProgress.get(i));
             }
         }
-        unique.add(AllProgress.get(AllProgress.size() - 1));
 
         for (int i = 0; i < unique.size(); i++) {
             for (int j = 0; j < AllProgress.size(); j++) {
